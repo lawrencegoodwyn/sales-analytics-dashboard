@@ -1,77 +1,78 @@
-# Meridian Fitness Group — Sales & Revenue Analytics
+# 📊 Meridian Fitness Group — Sales & Revenue Dashboard
 
-A 14-page Power BI dashboard covering the full sales lifecycle for a
-membership-based business: lead generation → pipeline → close → activation →
-retention, plus rep performance, quota pacing, and forecasting.
+**A 14-page Power BI system that tells sales leadership, every day, whether
+the quarter is on track — and exactly where it isn't.**
 
-**Built for:** VP of Sales / Sales Ops
-**Refresh cadence:** Daily
-**Stack:** Power BI (Power Query, DAX), CRM source data (Salesforce-style
-object model)
-
-> **A note on this project:** the dashboard was originally built for real
-> university enrollment operations (leads → applications → deposits →
-> enrolled students). The data model, relationships, and all 150+ DAX
-> measures below are unchanged — I relabeled the visible terminology to a
-> fictional gym-membership sales company so the work is legible to any BI or
-> sales-analytics recruiter, not just higher-ed. See
-> [`docs/rebrand-glossary.md`](docs/rebrand-glossary.md) for the exact
-> term mapping. I'm glad to speak to either the original context or the
-> sales framing in an interview — the analytical work is identical either
-> way.
+<p>
+  <img alt="Power BI" src="https://img.shields.io/badge/Power%20BI-F2C811?style=flat&logo=powerbi&logoColor=black">
+  <img alt="DAX" src="https://img.shields.io/badge/DAX-150%2B%20measures-informational">
+  <img alt="Pages" src="https://img.shields.io/badge/Report%20Pages-14-blue">
+  <img alt="Refresh" src="https://img.shields.io/badge/Refresh-Daily-success">
+</p>
 
 ---
 
-## Screenshots
+## What this dashboard does
 
-<!-- Drop your exported PNGs into /screenshots using these filenames and
-     these embeds will render automatically on GitHub. See docs/page-tour.md
-     for the full page list and naming convention. -->
+| Question a leader asks | What answers it |
+|---|---|
+| Will we hit quota this quarter? | A rolling pacing model projects the close based on the last 4 weeks of velocity, not lifetime average |
+| Who's actually performing? | A leaderboard ranks reps live, correctly re-ranking within whatever territory or quarter is filtered |
+| Where's the pipeline leaking? | Stage-by-stage conversion, computed dynamically so new pipeline stages don't require rebuilding formulas |
+| Are closed deals actually sticking? | Post-close cancellations are tracked separately from bookings, so a signed deal that falls through isn't counted as a real win |
+| Is a lead source bringing quality or just volume? | Percentile distribution on lead quality — not an average that a few great leads can hide a weak channel behind |
+| Are financing/discount programs paying off? | Conversion rate on offered vs. confirmed financing, tracked at the program level |
+
+---
+
+## Business value
+
+- **Turns "did we hit the number" into "will we hit the number, and what's the gap"** — the pacing model surfaces the answer weeks before period-end, not after.
+- **Catches phantom wins.** A closed deal that never activates looks identical to a real one on a standard bookings report; this model tracks the two separately.
+- **Makes rep performance filterable without breaking.** Leaderboards built on naive ranking formulas silently produce wrong results when a manager filters to one region — this one doesn't.
+- **Flags weak lead sources before they scale.** Distribution-based quality scoring catches a channel padding volume with poor-fit leads — an average alone would miss it.
+- **Built on live CRM data**, not static exports — the model reads directly from Salesforce-style objects, so the numbers are always current.
+
+---
+
+## 📸 Screenshots
+
+<!-- Filenames match docs/page-tour.md — drop PNGs into /screenshots -->
 
 **Sales Overview**
 ![Sales Overview](screenshots/01-sales-overview.png)
 
-**Quota Progress (Pacing Model)**
+**Quota Progress — the pacing model, visualized**
 ![Quota Progress](screenshots/04-quota-progress.png)
 
 **Sales Funnel Analysis**
 ![Sales Funnel Analysis](screenshots/08-funnel-analysis.png)
 
-*(Full page list, including pages not shown above, in
+*(All 14 pages, with what each one does, in
 [`docs/page-tour.md`](docs/page-tour.md).)*
 
 ---
 
-## Why this is more than a "pretty dashboard"
+## Under the hood
 
-- **A working quota-pacing engine**, not just a static KPI. Rolling 4-week
-  velocity is measured against remaining time-to-goal to produce a live
-  "will we hit the number" projection, blended into a weighted rep
-  performance index.
-- **A dynamic, self-referencing sales funnel.** Stage-over-stage conversion
-  is computed by walking stage order via `TREATAS`, so the formula doesn't
-  need to be touched if a pipeline stage is added or removed.
-- **Rep leaderboard built on `RANKX`** with dense ranking that stays
-  correct under slicer filtering — rank within a filtered territory or
-  quarter, not just globally.
-- **Post-close attrition tracked separately from bookings** — a signed
-  contract that cancels before activation is treated as a phantom win, not
-  a real one. Most dashboards only track the close, not the leak after it.
-- **Statistical lead-quality scoring** via `PERCENTILEX.INC` — distribution
-  analysis, not just averages, to catch a channel that pads volume with
-  weak-fit leads.
-- **Sourced live from CRM objects**, not a flat CSV — real Power Query /
-  data-source experience against a Salesforce-style schema.
+The dashboard is built on a 190+ table star schema and 150+ DAX measures —
+not `SUM()` wrapped in a card. Highlights:
 
-Full DAX writeups with code: [`docs/dax-highlights.md`](docs/dax-highlights.md)
+- **Pacing engine** — rolling 4-week velocity vs. remaining time-to-goal, rolled into a weighted performance index
+- **Self-updating funnel math** — stage conversion computed via `TREATAS`, so it doesn't need editing when a stage is added or removed
+- **Dense `RANKX` leaderboard** — stays accurate under any slicer/filter combination
+- **Statistical lead scoring** — `PERCENTILEX.INC` distribution analysis instead of a flat average
+- **CRM-native ETL** — Power Query built directly against Salesforce-style source objects
+
+Full code and explanations: [`docs/dax-highlights.md`](docs/dax-highlights.md)
 
 ---
 
-## Skills demonstrated
+## Capabilities on display
 
 | Area | Specifics |
 |---|---|
-| Data modeling | Star schema, 190+ tables, fact/dimension design, date table handling |
+| Data modeling | Star schema, 190+ tables, fact/dimension design, date-table handling |
 | DAX | Time intelligence, `RANKX`, `PERCENTILEX.INC`, `TREATAS`, `ALLSELECTED`, what-if pacing math |
 | ETL / Power Query | CRM (Salesforce-style) object extraction and transformation |
 | Dashboard design | 14-page executive-to-operational hierarchy, custom visuals, conditional formatting |
@@ -80,7 +81,7 @@ Full DAX writeups with code: [`docs/dax-highlights.md`](docs/dax-highlights.md)
 
 ---
 
-## Repo structure
+## 📁 Repo structure
 
 ```
 ├── README.md                   ← you are here
@@ -91,13 +92,18 @@ Full DAX writeups with code: [`docs/dax-highlights.md`](docs/dax-highlights.md)
 └── screenshots/                ← exported page images
 ```
 
-No `.pbix`/`.pbit` file is included in this repo — the source model
-connects to real institutional data, which isn't shareable publicly. This
-repo is the case study: screenshots, real DAX, and a written breakdown of
-the design decisions.
+No `.pbix`/`.pbit` file is included — the source model connects to real
+institutional data that isn't shareable publicly. This repo is the case
+study: real DAX, real screenshots, real design decisions, written up.
+
+> **Framing note:** this dashboard originated as a real university
+> enrollment pipeline (leads → applications → deposits → enrolled students),
+> relabeled here to a sales frame so it reads clearly outside higher-ed. The
+> model, relationships, and every measure are unchanged. Full mapping in
+> [`docs/rebrand-glossary.md`](docs/rebrand-glossary.md).
 
 ---
 
 ## Contact
 
-*(add your name / LinkedIn / email here)*
+*(add name / LinkedIn / email here)*
